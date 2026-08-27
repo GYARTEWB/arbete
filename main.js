@@ -1,3 +1,1 @@
-document.body.onclick(e => {
-    alert(1);
-})
+onclick(e=>alert(1));

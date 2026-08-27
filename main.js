@@ -1,1 +1,1 @@
-onclick(e=>alert(1));
+addEventListener("click",(e)=>alert(1));

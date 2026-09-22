@@ -1,6 +1,14 @@
 *{
-    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
 }
-p{
-    background-color: brown;
+
+#game {
+    height: 100%;
+    width: 100%;
+    background-color: black;
+    image-rendering: optimizeSpeed;
 }

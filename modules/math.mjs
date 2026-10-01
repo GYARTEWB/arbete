@@ -11,15 +11,28 @@ class Vector {
             str += "this."+this.#namingConvention(i)+"=0;";
         return this.#assignZero[dimensions] = new Function(str);
     }
-    static #assign = {};
-    static #buildAssign(dimensions) {
-        if(this.#assign[dimensions]) return this.#assign[dimensions];
+    static #assignVector = {};
+    static #buildAssignVector(dimensions) {
+        if(this.#assignVector[dimensions]) return this.#assignVector[dimensions];
         let e = this.#namingConvention(0), str = "this."+e+"=v."+e+";";
         for(let i = 1; i < dimensions; i++) {
             e = this.#namingConvention(i);
             str += "this."+e+"=v."+e+";";
         }
-        return this.#assign[dimensions] = new Function("v",str);
+        console.log(str);
+        return this.#assignVector[dimensions] = new Function("v",str);
+    }
+    static #assign = {};
+    static #buildAssign(dimensions) {
+        if(this.#assign[dimensions]) return this.#assign[dimensions];
+        let e = "",  str = "", input = [];
+        for(let i = 0; i < dimensions; i++) {
+            e = this.#namingConvention(i);
+            input.push(e);
+            str += "this."+e+"="+e+";";
+        }
+        console.log(str);
+        return this.#assign[dimensions] = new Function(...input,str);
     }
     static #dot = {};
     static #buildDot(dimensions) {
@@ -65,6 +78,7 @@ class Vector {
         for(let i = 0; i < elements.length; i++)
             this[Vector.#namingConvention(i)] = elements[i];
         this.assignZero = Vector.#buildAssignZero(elements.length);
+        this.assignVector = Vector.#buildAssignVector(elements.length);
         this.assign = Vector.#buildAssign(elements.length);
         this.dot = Vector.#buildDot(elements.length);
         this.add = Vector.#buildAdd(elements.length);

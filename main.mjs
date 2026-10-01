@@ -1,5 +1,9 @@
 import {Vector} from "./modules/math.mjs";
 
+let v = new Vector(1,1,1);
+
+console.log(v);
+
 const gameCanvas = document.getElementById("game");
 const gameCTX = gameCanvas.getContext("2d");
 gameCanvas.height = 50;

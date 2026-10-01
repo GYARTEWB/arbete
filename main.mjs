@@ -1,3 +1,5 @@
+import {Vector} from "./modules/math.mjs";
+
 const gameCanvas = document.getElementById("game");
 const gameCTX = gameCanvas.getContext("2d");
 gameCanvas.height = 50;

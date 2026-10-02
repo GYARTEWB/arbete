@@ -6,8 +6,8 @@ class Vector {
     static #assignVector = {};
     static #buildAssignVector(dimensions) {
         if(this.#assignVector[dimensions]) return this.#assignVector[dimensions];
-        let e = this.#namingConvention(0), str = "this."+e+"=v."+e+";";
-        for(let i = 1; i < dimensions; i++) {
+        let e = "", str = "";
+        for(let i = 0; i < dimensions; i++) {
             e = this.#namingConvention(i);
             str += "this."+e+"=v."+e+";";
         }
@@ -28,9 +28,9 @@ class Vector {
     static #buildDot(dimensions) {
         if(this.#dot[dimensions]) return this.#dot[dimensions];
         let e = this.#namingConvention(0), str = "return this."+e+"*v."+e;
-        for(let i = 1; i < dimensions && (str += "+"); i++) {
+        for(let i = 1; i < dimensions; i++) {
             e = this.#namingConvention(i);
-            str += "this."+e+"*v."+e;
+            str += "+this."+e+"*v."+e;
         }
         return this.#dot[dimensions] = new Function("v",str+";");
     }
@@ -38,17 +38,17 @@ class Vector {
     static #buildMagnitude(dimensions) {
         if(this.#magnitude[dimensions]) return this.#magnitude[dimensions];
         let e = this.#namingConvention(0), str = "return (this."+e+"*this."+e;
-        for(let i = 1; i < dimensions && (str += "+"); i++) {
+        for(let i = 1; i < dimensions; i++) {
             e = this.#namingConvention(i);
-            str += "this."+e+"*this."+e;
+            str += "+this."+e+"*this."+e;
         }
         return this.#magnitude[dimensions] = new Function(str+")**0.5;");
     }
     static #add = {};
     static #buildAdd(dimensions) {
         if(this.#add[dimensions]) return this.#add[dimensions];
-        let e = this.#namingConvention(0), str = "this."+e+"+=v."+e+";";
-        for(let i = 1; i < dimensions; i++) {
+        let e = "", str = "";
+        for(let i = 0; i < dimensions; i++) {
             e = this.#namingConvention(i);
             str += "this."+e+"+=v."+e+";";
         }
@@ -57,8 +57,8 @@ class Vector {
     static #subtract = {};
     static #buildSubtract(dimensions) {
         if(this.#subtract[dimensions]) return this.#subtract[dimensions];
-        let e = this.#namingConvention(0), str = "this."+e+"-=v."+e+";";
-        for(let i = 1; i < dimensions; i++) {
+        let e = "", str = "";
+        for(let i = 0; i < dimensions; i++) {
             e = this.#namingConvention(i);
             str += "this."+e+"-=v."+e+";";
         }
@@ -67,8 +67,8 @@ class Vector {
     static #scale = {};
     static #buildScale(dimensions) {
         if(this.#scale[dimensions]) return this.#scale[dimensions];
-        let e = this.#namingConvention(0), str = "this."+e+"*=s;";
-        for(let i = 1; i < dimensions; i++) {
+        let e = "", str = "";
+        for(let i = 0; i < dimensions; i++) {
             e = this.#namingConvention(i);
             str += "this."+e+"*=s;";
         }

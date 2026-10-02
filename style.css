@@ -1,14 +1,24 @@
-*{
-    height: 100%;
-    width: 100%;
+body,
+html{
     margin: 0;
     padding: 0;
     overflow: hidden;
 }
 
 #game {
+    top: 0;
+    left: 0;
     height: 100%;
     width: 100%;
     background-color: black;
     image-rendering: optimizeSpeed;
+    position: absolute;
+}
+
+#info {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: white;
+    margin: 0;
 }

@@ -77,15 +77,46 @@ class Vector {
     static zero(dimensions) {
         return new Vector(...Array(dimensions));
     }
+    #calcVector;
+    get calc() {
+        Object.defineProperty(this,"calc",{get(){return this.#calcVector.assignVector(this)}});
+        this.#calcVector = Vector.zero(this.#dimensions);
+        return this.#calcVector.assignVector(this);
+    }
+    #dimensions;
+    get dimensions() {
+        return this.#dimensions;
+    }
+    assignVector(vector) {
+        this.assignVector = Vector.#buildAssignVector(this.#dimensions)
+        return this.assignVector(vector);
+    }
+    assign(...elements) {
+        this.assign = Vector.#buildAssign(this.#dimensions)
+        return this.assign(...elements);
+    }
+    dot(vector) {
+        this.dot = Vector.#buildDot(this.#dimensions)
+        return this.dot(vector);
+    }
+    magnitude() {
+        this.magnitude = Vector.#buildMagnitude(this.#dimensions)
+        return this.magnitude();
+    }
+    add(vector) {
+        this.add = Vector.#buildAdd(this.#dimensions)
+        return this.add(vector);
+    }
+    subtract(vector) {
+        this.subtract = Vector.#buildSubtract(this.#dimensions)
+        return this.subtract(vector);
+    }
+    scale(scalar) {
+        this.scale = Vector.#buildScale(this.#dimensions)
+        return this.scale(scalar);
+    }
     constructor(...elements) {
-        for(let i = 0; i < elements.length; i++)
-            this[Vector.#namingConvention(i)] = elements[i]??0;
-        this.assignVector = Vector.#buildAssignVector(elements.length);
-        this.assign = Vector.#buildAssign(elements.length);
-        this.dot = Vector.#buildDot(elements.length);
-        this.magnitude = Vector.#buildMagnitude(elements.length);
-        this.add = Vector.#buildAdd(elements.length);
-        this.subtract = Vector.#buildSubtract(elements.length);
-        this.scale = Vector.#buildScale(elements.length);
+        for(let i = 0; i < elements.length; this[Vector.#namingConvention(i)] = elements[i++]??0);
+        this.#dimensions = elements.length;
     }
 }

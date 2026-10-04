@@ -37,12 +37,12 @@ class Vector {
     static #magnitude = {};
     static #buildMagnitude(dimensions) {
         if(this.#magnitude[dimensions]) return this.#magnitude[dimensions];
-        let e = this.#namingConvention(0), str = "return (this."+e+"*this."+e;
+        let e = this.#namingConvention(0), str = "return Math.sqrt(this."+e+"*this."+e;
         for(let i = 1; i < dimensions; i++) {
             e = this.#namingConvention(i);
             str += "+this."+e+"*this."+e;
         }
-        return this.#magnitude[dimensions] = new Function(str+")**0.5;");
+        return this.#magnitude[dimensions] = new Function(str+");");
     }
     static #add = {};
     static #buildAdd(dimensions) {
@@ -79,9 +79,9 @@ class Vector {
     }
     #calcVector;
     get calc() {
-        Object.defineProperty(this,"calc",{get(){return this.#calcVector.assignVector(this)}});
         this.#calcVector = Vector.zero(this.#dimensions);
-        return this.#calcVector.assignVector(this);
+        Object.defineProperty(this,"calc",{get:this.#calcVector.assignVector.bind(this.#calcVector,this)});
+        return this.calc;
     }
     #dimensions;
     get dimensions() {
@@ -99,9 +99,13 @@ class Vector {
         this.dot = Vector.#buildDot(this.#dimensions)
         return this.dot(vector);
     }
-    magnitude() {
-        this.magnitude = Vector.#buildMagnitude(this.#dimensions)
-        return this.magnitude();
+    get selfDot() {
+        Object.defineProperty(this,"selfDot",{get:Vector.#buildDot(this.#dimensions).bind(this,this)});
+        return this.selfDot;
+    }
+    get magnitude() {
+        Object.defineProperty(this,"magnitude",{get:Vector.#buildMagnitude(this.#dimensions)});
+        return this.magnitude;
     }
     add(vector) {
         this.add = Vector.#buildAdd(this.#dimensions)

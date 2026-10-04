@@ -22,7 +22,7 @@ let camera = new Camera(scene,1,new Vector(0,0,1));
 let time = performance.now();
 let deltaTime = 0;
 
-let rotationSpeed = new Vector(1,0);
+let rotationSpeed = new Vector(0,1);
 let speed = new Vector(0,1000,0);
 
 function game() {

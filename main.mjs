@@ -1,5 +1,5 @@
 import {Vector} from "./modules/math.mjs";
-import {Camera, Scene, Surface} from "./modules/scene.mjs";
+import {Dot, Line, Surface, Block, Scene, Camera} from "./modules/scene.mjs";
 
 const info = document.getElementById("info");
 
@@ -16,14 +16,14 @@ window.addEventListener("resize",(e) => {
 });
 let scene = new Scene();
 for(let i = 0; i < 10000; i++)
-    scene.surfaces.add(new Surface(new Vector(5000-Math.random()*10000,Math.random()*100000,5000-Math.random()*10000)));
-let camera = new Camera(scene,1,new Vector(0,0,1));
+    scene.elements.add(new Dot(new Vector(500000-Math.random()*1000000,Math.random()*10000000,500000-Math.random()*1000000),255,255,255));
+let camera = new Camera(scene,1,100000);
 
 let time = performance.now();
 let deltaTime = 0;
 
-let rotationSpeed = new Vector(0,1);
-let speed = new Vector(0,1000,0);
+let rotationSpeed = new Vector(0,0);
+let speed = new Vector(0,30000,0);
 
 function game() {
     imageData.data.fill(0);

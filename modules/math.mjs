@@ -44,6 +44,16 @@ class Vector {
         }
         return this.#magnitude[dimensions] = new Function(str+");");
     }
+    static #selfDot = {};
+    static #buildSelfDot(dimensions) {
+        if(this.#selfDot[dimensions]) return this.#selfDot[dimensions];
+        let e = this.#namingConvention(0), str = "return this."+e+"*this."+e;
+        for(let i = 1; i < dimensions; i++) {
+            e = this.#namingConvention(i);
+            str += "+this."+e+"*this."+e;
+        }
+        return this.#selfDot[dimensions] = new Function(str+";");
+    }
     static #add = {};
     static #buildAdd(dimensions) {
         if(this.#add[dimensions]) return this.#add[dimensions];
@@ -74,6 +84,56 @@ class Vector {
         }
         return this.#scale[dimensions] = new Function("s",str+"return this;");
     }
+    static #floor = {}
+    static #buildFloor(dimensions) {
+        if(this.#floor[dimensions]) return this.#floor[dimensions];
+        let e = "", str = "";
+        for(let i = 0; i < dimensions; i++) {
+            e = this.#namingConvention(i);
+            str += "this."+e+"=Math.floor(this."+e+");"
+        }
+        return this.#floor[dimensions] = new Function(str+";return this;");
+    }
+    static #round = {}
+    static #buildRound(dimensions) {
+        if(this.#round[dimensions]) return this.#round[dimensions];
+        let e = "", str = "";
+        for(let i = 0; i < dimensions; i++) {
+            e = this.#namingConvention(i);
+            str += "this."+e+"=Math.round(this."+e+");"
+        }
+        return this.#round[dimensions] = new Function(str+";return this;");
+    }
+    static #ceil = {}
+    static #buildCeil(dimensions) {
+        if(this.#ceil[dimensions]) return this.#ceil[dimensions];
+        let e = "", str = "";
+        for(let i = 0; i < dimensions; i++) {
+            e = this.#namingConvention(i);
+            str += "this."+e+"=Math.ceil(this."+e+");"
+        }
+        return this.#ceil[dimensions] = new Function(str+";return this;");
+    }
+    static #abs = {}
+    static #buildAbs(dimensions) {
+        if(this.#abs[dimensions]) return this.#abs[dimensions];
+        let e = "", str = "";
+        for(let i = 0; i < dimensions; i++) {
+            e = this.#namingConvention(i);
+            str += "this."+e+"=Math.abs(this."+e+");"
+        }
+        return this.#abs[dimensions] = new Function(str+";return this;");
+    }
+    static #sign = {}
+    static #buildSign(dimensions) {
+        if(this.#sign[dimensions]) return this.#sign[dimensions];
+        let e = "", str = "";
+        for(let i = 0; i < dimensions; i++) {
+            e = this.#namingConvention(i);
+            str += "this."+e+"=Math.sign(this."+e+");"
+        }
+        return this.#sign[dimensions] = new Function(str+";return this;");
+    }
     static zero(dimensions) {
         return new Vector(...Array(dimensions));
     }
@@ -100,7 +160,7 @@ class Vector {
         return this.dot(vector);
     }
     get selfDot() {
-        Object.defineProperty(this,"selfDot",{get:Vector.#buildDot(this.#dimensions).bind(this,this)});
+        Object.defineProperty(this,"selfDot",{get:Vector.#buildSelfDot(this.#dimensions)});
         return this.selfDot;
     }
     get magnitude() {
@@ -118,6 +178,26 @@ class Vector {
     scale(scalar) {
         this.scale = Vector.#buildScale(this.#dimensions)
         return this.scale(scalar);
+    }
+    floor() {
+        this.floor = Vector.#buildFloor(this.#dimensions);
+        return this.floor();
+    }
+    round() {
+        this.round = Vector.#buildRound(this.#dimensions);
+        return this.round();
+    }
+    ceil() {
+        this.ceil = Vector.#buildCeil(this.#dimensions);
+        return this.ceil();
+    }
+    abs() {
+        this.abs = Vector.#buildAbs(this.#dimensions);
+        return this.abs();
+    }
+    sign() {
+        this.sign = Vector.#buildSign(this.#dimensions);
+        return this.sign();
     }
     constructor(...elements) {
         for(let i = 0; i < elements.length; this[Vector.#namingConvention(i)] = elements[i++]??0);

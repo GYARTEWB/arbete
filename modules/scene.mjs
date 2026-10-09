@@ -119,7 +119,7 @@ class depthBuffer {
     constructor(width,height) {
         this.width = width;
         this.height = height;
-        this.data = new Array(width*height).fill(Infinity);
+        this.data = new Float32Array(width*height).fill(Infinity);
     }
     reset() {
         this.data.fill(Infinity);

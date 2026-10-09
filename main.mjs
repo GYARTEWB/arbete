@@ -5,7 +5,7 @@ const info = document.getElementById("info");
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
-canvas.height = 500;
+canvas.height = 250;
 var propX = window.innerWidth / window.innerHeight;
 canvas.width = Math.round(canvas.height * propX);
 let imageData = ctx.createImageData(canvas.width,canvas.height);
@@ -15,15 +15,15 @@ window.addEventListener("resize",(e) => {
     imageData = ctx.createImageData(canvas.width,canvas.height);
 });
 let scene = new Scene();
-for(let i = 0; i < 10000; i++)
-    scene.elements.add(new Dot(new Vector(500000-Math.random()*1000000,Math.random()*10000000,500000-Math.random()*1000000),255,255,255));
+
 let camera = new Camera(scene,1,100000);
 
 let time = performance.now();
 let deltaTime = 0;
-
+for(let i = 0; i < 100000; i++)
+    scene.elements.add(new Dot(new Vector(500000-Math.random()*1000000,Math.random()*10000000,500000-Math.random()*1000000),255,255,255));
 let rotationSpeed = new Vector(0,0);
-let speed = new Vector(0,30000,0);
+let speed = new Vector(0,10000,0);
 
 function game() {
     imageData.data.fill(0);

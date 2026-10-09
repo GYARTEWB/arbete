@@ -1,26 +1,28 @@
 import {Vector} from "./math.mjs";
 export {Dot, Line, Surface, Block, Scene, Camera};
 
+var screenCoordinate = Vector.zero(2);
+var O = Vector.zero(3);
+var ON = 0;
+
 class Dot {
-    #O; #ON; #screenCoordinate; position; r;g;b;
+    position; r;g;b;
     constructor(position=Vector.zero(3),r,g,b) {
         this.position = position;
-        this.#O = Vector.zero(3);
-        this.#screenCoordinate = Vector.zero(2);
         this.r = r;
         this.g = g;
         this.b = b;
     }
     draw(camera) {
-        this.#ON = this.#O.assignVector(this.position).subtract(camera.position).dot(camera.N);
-        if(this.#ON>0) {
-            this.#screenCoordinate.assign(
-                camera.X.dot(this.#O),
-                camera.Y.dot(this.#O)
-            ).scale(camera.screenCoordinateScalar/this.#ON).add(camera.middle);
-            if(this.#screenCoordinate.x>=0&&this.#screenCoordinate.x<camera.wScalar && this.#screenCoordinate.y>=0&&this.#screenCoordinate.y<camera.hScalar) {
-                let index = camera.wScalar*(this.#screenCoordinate.y|0)+(this.#screenCoordinate.x|0);
-                let distance = this.#O.selfDot;
+        ON = O.assignVector(this.position).subtract(camera.position).dot(camera.N);
+        if(ON>0) {
+            screenCoordinate.assign(
+                camera.X.dot(O),
+                camera.Y.dot(O)
+            ).scale(camera.screenCoordinateScalar/ON).add(camera.middle);
+            if(screenCoordinate.X>=0&&screenCoordinate.X<camera.wScalar && screenCoordinate.Y>=0&&screenCoordinate.Y<camera.hScalar) {
+                let index = camera.wScalar*(screenCoordinate.Y|0)+(screenCoordinate.X|0);
+                let distance = O.selfDot;
                 if(distance<camera.depthBuffer.data[index]) {
                     camera.depthBuffer.data[index] = distance;
                     index *= 4;
@@ -34,16 +36,16 @@ class Dot {
     }
 }
 
-function DDA(start,direction,steps,func=(walk)=>0) {
+function DDA(start,direction,steps,func=(walk)=>null) {
     let walk = start.calc;
     let step = direction.calc;
     let itterations = 0;
-    if(Math.abs(direction.y)>Math.abs(direction.x)) {
-        step.assign(direction.x/direction.y,1).scale(Math.sign(direction.y));
-        itterations = steps.y;
+    if(Math.abs(direction.Y)>Math.abs(direction.X)) {
+        step.assign(direction.X/direction.Y,1).scale(Math.sign(direction.Y));
+        itterations = steps.Y;
     } else {
-        step.assign(1,direction.y/direction.x).scale(Math.sign(direction.x));
-        itterations = steps.x;
+        step.assign(1,direction.Y/direction.X).scale(Math.sign(direction.X));
+        itterations = steps.X;
     }
     for(let i = 0; i < itterations; i++) {
         func(walk.calc.floor());
@@ -56,9 +58,10 @@ class Line {
     constructor(start=Vector.zero(3),end=new Vector(1,1,1)) {
         this.start = start;
         this.end = end;
+        this.to = Vector.zero(3);
     }
     draw(camera) {
-
+        let ON = camera.N.dot(this.start.calc.subtract(camera.position));
     }
 }
 
@@ -139,12 +142,12 @@ class Camera {
         this.update();
     }
     update() {
-        let cz = Math.cos(this.rotation.x), sz = Math.sin(this.rotation.x), cx = Math.cos(this.rotation.y), sx = Math.sin(this.rotation.y);
+        let cz = Math.cos(this.rotation.X), sz = Math.sin(this.rotation.X), cx = Math.cos(this.rotation.Y), sx = Math.sin(this.rotation.Y);
         this.X.assign(cz,-sz);
         this.N.assign(cx*sz,cx*cz,sx);
         this.Y.assign(sx*sz,sx*cz,-cx);
-        this.rotation.x %= Math.PI*2;
-        this.rotation.y %= Math.PI*2;
+        this.rotation.X %= Math.PI*2;
+        this.rotation.Y %= Math.PI*2;
     }
     shoot(imageData=new ImageData(0,0)) {
         if(imageData.width!=this.depthBuffer.width||imageData.height!=this.depthBuffer.height)

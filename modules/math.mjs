@@ -1,7 +1,32 @@
 export {Vector};
+//Vector klassen ska användas på följande sätt:
+//undvik att skapa nya vektorer så mycket som möjligt och återanvänd vektorer eftersom extra saker sker då man skapar en vektor
+//det ska byggas upp ett system av vektorer som pratar med varandra, varje vektor anpassar sig till där den befinner sig i detta system
 class Vector {
-    static #namingConvention(index) {
-        return String.fromCharCode(index<3?120+index:122-index);
+    static #buildFunction(name,...input) {
+        let inputs = input.slice(0,-1).toString();
+        let code = input[input.length-1];
+        code = "(function "+name+"("+inputs+"){"+code+"})"; //funktionen får ett namn för att inte vara anonym, detta hjälper mycket i felsökning och optimering
+        console.log(code); //så man kan se funktionen i console
+        return eval(code);
+    }
+    static #namingConvention(index) { //räknar i bas 26
+        if(index < 3) {
+            return String.fromCharCode(88+index);
+        } else if(index > 25) {
+            return this.#namingConvention((index/26|0)-1)+this.#namingConvention(index%26);
+        }
+        return String.fromCharCode(90-index);
+    } //specialiserade vektor metoder för varje dimension jag kan stötta på byggs en gång om det behövs och sedan blir tilldelad för varje vektor som behöver
+    static #calc = {};
+    static #buildCalc(dimensions) {
+        if(this.#calc[dimensions]) return this.#calc[dimensions];
+        let e = "", str = "";
+        for(let i = 0; i < dimensions; i++) {
+            e = this.#namingConvention(i);
+            str += "this.#calcVector."+e+"=this."+e+";";
+        }
+        return this.#calc[dimensions] = this.#buildFunction("calc"+dimensions,str+"return this.#calcVector;");
     }
     static #assignVector = {};
     static #buildAssignVector(dimensions) {
@@ -11,7 +36,7 @@ class Vector {
             e = this.#namingConvention(i);
             str += "this."+e+"=v."+e+";";
         }
-        return this.#assignVector[dimensions] = new Function("v",str+"return this;");
+        return this.#assignVector[dimensions] = this.#buildFunction("assignVector"+dimensions,"v",str+"return this;");
     }
     static #assign = {};
     static #buildAssign(dimensions) {
@@ -19,10 +44,10 @@ class Vector {
         let e = "",  str = "", input = [];
         for(let i = 0; i < dimensions; i++) {
             e = this.#namingConvention(i);
-            input.push(e);
+            input.push(e+"=0");
             str += "this."+e+"="+e+";";
         }
-        return this.#assign[dimensions] = new Function(...input,str+"return this");
+        return this.#assign[dimensions] = this.#buildFunction("assign"+dimensions,...input,str+"return this;");
     }
     static #dot = {};
     static #buildDot(dimensions) {
@@ -32,7 +57,7 @@ class Vector {
             e = this.#namingConvention(i);
             str += "+this."+e+"*v."+e;
         }
-        return this.#dot[dimensions] = new Function("v",str+";");
+        return this.#dot[dimensions] = this.#buildFunction("dot"+dimensions,"v",str+";");
     }
     static #magnitude = {};
     static #buildMagnitude(dimensions) {
@@ -42,7 +67,7 @@ class Vector {
             e = this.#namingConvention(i);
             str += "+this."+e+"*this."+e;
         }
-        return this.#magnitude[dimensions] = new Function(str+");");
+        return this.#magnitude[dimensions] = this.#buildFunction("magnitude"+dimensions,str+");");
     }
     static #selfDot = {};
     static #buildSelfDot(dimensions) {
@@ -52,7 +77,7 @@ class Vector {
             e = this.#namingConvention(i);
             str += "+this."+e+"*this."+e;
         }
-        return this.#selfDot[dimensions] = new Function(str+";");
+        return this.#selfDot[dimensions] = this.#buildFunction("selfDot"+dimensions,str+";");
     }
     static #add = {};
     static #buildAdd(dimensions) {
@@ -62,7 +87,7 @@ class Vector {
             e = this.#namingConvention(i);
             str += "this."+e+"+=v."+e+";";
         }
-        return this.#add[dimensions] = new Function("v",str+"return this;");
+        return this.#add[dimensions] = this.#buildFunction("add"+dimensions,"v",str+"return this;");
     }
     static #subtract = {};
     static #buildSubtract(dimensions) {
@@ -72,7 +97,7 @@ class Vector {
             e = this.#namingConvention(i);
             str += "this."+e+"-=v."+e+";";
         }
-        return this.#subtract[dimensions] = new Function("v",str+"return this;");
+        return this.#subtract[dimensions] = this.#buildFunction("subtract"+dimensions,"v",str+"return this;");
     }
     static #scale = {};
     static #buildScale(dimensions) {
@@ -82,7 +107,7 @@ class Vector {
             e = this.#namingConvention(i);
             str += "this."+e+"*=s;";
         }
-        return this.#scale[dimensions] = new Function("s",str+"return this;");
+        return this.#scale[dimensions] = this.#buildFunction("scale"+dimensions,"s",str+"return this;");
     }
     static #floor = {}
     static #buildFloor(dimensions) {
@@ -92,7 +117,7 @@ class Vector {
             e = this.#namingConvention(i);
             str += "this."+e+"=Math.floor(this."+e+");"
         }
-        return this.#floor[dimensions] = new Function(str+";return this;");
+        return this.#floor[dimensions] = this.#buildFunction("floor"+dimensions,str+";return this;");
     }
     static #round = {}
     static #buildRound(dimensions) {
@@ -102,7 +127,7 @@ class Vector {
             e = this.#namingConvention(i);
             str += "this."+e+"=Math.round(this."+e+");"
         }
-        return this.#round[dimensions] = new Function(str+";return this;");
+        return this.#round[dimensions] = this.#buildFunction("round"+dimensions,str+";return this;");
     }
     static #ceil = {}
     static #buildCeil(dimensions) {
@@ -112,7 +137,7 @@ class Vector {
             e = this.#namingConvention(i);
             str += "this."+e+"=Math.ceil(this."+e+");"
         }
-        return this.#ceil[dimensions] = new Function(str+";return this;");
+        return this.#ceil[dimensions] = this.#buildFunction("ceil"+dimensions,str+";return this;");
     }
     static #abs = {}
     static #buildAbs(dimensions) {
@@ -122,7 +147,7 @@ class Vector {
             e = this.#namingConvention(i);
             str += "this."+e+"=Math.abs(this."+e+");"
         }
-        return this.#abs[dimensions] = new Function(str+";return this;");
+        return this.#abs[dimensions] = this.#buildFunction("abs"+dimensions,str+";return this;");
     }
     static #sign = {}
     static #buildSign(dimensions) {
@@ -132,15 +157,15 @@ class Vector {
             e = this.#namingConvention(i);
             str += "this."+e+"=Math.sign(this."+e+");"
         }
-        return this.#sign[dimensions] = new Function(str+";return this;");
+        return this.#sign[dimensions] = this.#buildFunction("sign"+dimensions,str+";return this;");
     }
     static zero(dimensions) {
         return new Vector(...Array(dimensions));
     }
     #calcVector;
-    get calc() {
+    get calc() { //prototype metoder lägger till en metod med samma namn till objektet, dessa prototype metoder skrivs då över och kallas bara en gång för varje vektor, varje vektor får då bara de metoder som kommer att användas med dem
         this.#calcVector = Vector.zero(this.#dimensions);
-        Object.defineProperty(this,"calc",{get:this.#calcVector.assignVector.bind(this.#calcVector,this)});
+        Object.defineProperty(this,"calc",{get:Vector.#buildCalc(this.#dimensions)});
         return this.calc;
     }
     #dimensions;

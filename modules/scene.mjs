@@ -1,9 +1,36 @@
 import {Vector} from "./math.mjs";
-export {Dot, Line, Surface, Block, Scene, Camera};
+export {Star, Dot, Line, Surface, Block, Scene, Camera};
 
 var screenCoordinate = Vector.zero(2);
 var O = Vector.zero(3);
 var ON = 0;
+
+class Star {
+    position; brightnesss = Math.random();
+    constructor(x,y) {
+        let sy = Math.sin(y), sx = Math.sin(x), cx = Math.cos(x), cy = Math.cos(y);
+        this.position = new Vector(sy*cx,sy*sx,cy);
+    }
+    draw(camera) {
+        ON = this.position.dot(camera.N);
+        if(ON>0) {
+            screenCoordinate.assign(
+                camera.X.dot(this.position),
+                camera.Y.dot(this.position)
+            ).scale(camera.screenCoordinateScalar/ON).add(camera.middle);
+            if(screenCoordinate.X>=0&&screenCoordinate.X<camera.wScalar && screenCoordinate.Y>=0&&screenCoordinate.Y<camera.hScalar) {
+                let index = camera.wScalar*(screenCoordinate.Y|0)+(screenCoordinate.X|0);
+                if(true) {
+                    index *= 4;
+                    camera.imageData[index] = 255;
+                    camera.imageData[index+1] = 255;
+                    camera.imageData[index+2] = 255;
+                    camera.imageData[index+3] = 255*this.brightnesss;
+                }
+            }
+        }
+    }
+}
 
 class Dot {
     position; r;g;b;
@@ -127,6 +154,7 @@ class depthBuffer {
 }
 
 class Camera {
+    maxYrotation=Math.PI*0.5;
     imageData; depthBuffer; middle; hScalar; wScalar; scene; position; rotation; screenCoordinateScalar; screenDistance; X; N; Y; light;
     constructor(scene=new Scene(),screenDistance=1,light=100,position=Vector.zero(3),rotation=Vector.zero(2)) {
         this.middle = Vector.zero(2);
@@ -134,7 +162,7 @@ class Camera {
         this.position = position;
         this.rotation = rotation;
         this.screenDistance = screenDistance;
-        this.X = Vector.zero(2);
+        this.X = Vector.zero(3);
         this.N = Vector.zero(3);
         this.Y = Vector.zero(3);
         this.light = light;
@@ -142,12 +170,15 @@ class Camera {
         this.update();
     }
     update() {
+        this.rotation.X %= Math.PI*2;
+        if(this.rotation.Y>this.maxYrotation)
+            this.rotation.Y=this.maxYrotation;
+        else if(this.rotation.Y<-this.maxYrotation)
+            this.rotation.Y=-this.maxYrotation;
         let cz = Math.cos(this.rotation.X), sz = Math.sin(this.rotation.X), cx = Math.cos(this.rotation.Y), sx = Math.sin(this.rotation.Y);
-        this.X.assign(cz,-sz);
+        this.X.assign(cz,-sz,0);
         this.N.assign(cx*sz,cx*cz,sx);
         this.Y.assign(sx*sz,sx*cz,-cx);
-        this.rotation.X %= Math.PI*2;
-        this.rotation.Y %= Math.PI*2;
     }
     shoot(imageData=new ImageData(0,0)) {
         if(imageData.width!=this.depthBuffer.width||imageData.height!=this.depthBuffer.height)

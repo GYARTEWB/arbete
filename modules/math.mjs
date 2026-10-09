@@ -159,9 +159,6 @@ class Vector {
         }
         return this.#sign[dimensions] = this.#buildFunction("sign"+dimensions,str+";return this;");
     }
-    static zero(dimensions) {
-        return new Vector(...Array(dimensions));
-    }
     #calcVector;
     get calc() { //prototype metoder lägger till en metod med samma namn till objektet, dessa prototype metoder skrivs då över och kallas bara en gång för varje vektor, varje vektor får då bara de metoder som kommer att användas med dem
         this.#calcVector = Vector.zero(this.#dimensions);
@@ -224,8 +221,11 @@ class Vector {
         this.sign = Vector.#buildSign(this.#dimensions);
         return this.sign();
     }
+    static zero(dimensions) {
+        return new Vector(...new Float64Array(dimensions));
+    }
     constructor(...elements) {
-        for(let i = 0; i < elements.length; this[Vector.#namingConvention(i)] = elements[i++]??0);
+        for(let i = 0; i < elements.length; this[Vector.#namingConvention(i)] = elements[i++]);
         this.#dimensions = elements.length;
     }
 }

@@ -1,15 +1,15 @@
 import {Vector} from "./math.mjs";
-export {Star, Dot, Line, Surface, Block, Scene, Camera};
+export {Star, Dot, Surface, Block, Scene, Camera};
 
 var screenCoordinate = Vector.zero(2);
 var O = Vector.zero(3);
 var ON = 0;
 
 class Star {
-    position; brightnesss = Math.random();
-    constructor(x,y) {
-        let sy = Math.sin(y), sx = Math.sin(x), cx = Math.cos(x), cy = Math.cos(y);
-        this.position = new Vector(sy*cx,sy*sx,cy);
+    position; brightnesss;
+    constructor() {
+        this.position = new Vector(Math.random()-0.5,Math.random()-0.5,Math.random()-0.5);
+        this.brightnesss = 0.8661-this.position.magnitude; //Math.ceil(10000*(0.5*3**0.5))/10000 - this.position.magnitude
     }
     draw(camera) {
         ON = this.position.dot(camera.N);
@@ -77,18 +77,6 @@ function DDA(start,direction,steps,func=(walk)=>null) {
     for(let i = 0; i < itterations; i++) {
         func(walk.calc.floor());
         walk.add(step);
-    }
-}
-
-class Line {
-    start; end;
-    constructor(start=Vector.zero(3),end=new Vector(1,1,1)) {
-        this.start = start;
-        this.end = end;
-        this.to = Vector.zero(3);
-    }
-    draw(camera) {
-        let ON = camera.N.dot(this.start.calc.subtract(camera.position));
     }
 }
 

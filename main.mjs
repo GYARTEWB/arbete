@@ -22,8 +22,8 @@ let time = performance.now();
 let deltaTime = 0;
 for(let i = 0; i < 1500; i++)
    scene.elements.add(new Star());
-for(let i = 0; i < 10000; i++)
-    scene.elements.add(new Dot(new Vector(Math.random()-0.5,Math.random()-0.5,Math.random()-0.5),255,0,0));
+for(let i = 0; i < 50000; i++)
+    scene.elements.add(new Dot(new Vector(Math.random()-0.5,2,Math.random()-0.5),255,0,0));
 let rotationSpeed = new Vector(0,0);
 let speed = new Vector(0,0,0);
 
